@@ -1,18 +1,19 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from typing import List, Optional
 import os
+from database import Database
 
 app = FastAPI(title="Multi-Agent Control Center")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 # Initialize task storage (in-memory for serverless)
-tasks = []
-task_counter = 0
+# tasks = []
+# task_counter = 0
 
 class TaskCreate(BaseModel):
     description: str
@@ -28,6 +29,7 @@ class Task(BaseModel):
 
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
+    tasks = await Database.get_tasks()
     return templates.TemplateResponse(
         "index.html",
         {
@@ -41,27 +43,42 @@ async def root(request: Request):
 
 @app.post("/api/tasks", response_model=Task)
 async def create_task(task: TaskCreate):
-    global task_counter
-    task_counter += 1
-    new_task = Task(
-        id=str(task_counter),
-        description=task.description,
-        agent_type=task.agent_type,
-        priority=task.priority
-    )
-    tasks.append(new_task)
-    return new_task
+    task_data = {
+        "description": task.description,
+        "agent_type": task.agent_type,
+        "priority": task.priority,
+        "status": "pending"
+    }
+    
+    created_task = await Database.create_task(task_data)
+    if not created_task:
+        raise HTTPException(status_code=500, detail="Failed to create task")
+    return created_task
 
 @app.get("/api/tasks", response_model=List[Task])
 async def get_tasks():
-    return tasks
+    return await Database.get_tasks()
 
 @app.get("/api/tasks/{task_id}", response_model=Task)
 async def get_task(task_id: str):
-    for task in tasks:
-        if task.id == task_id:
-            return task
-    return None
+    task = await Database.get_task(task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    return task
+
+@app.put("/api/tasks/{task_id}/status")
+async def update_task_status(task_id: str, status: str):
+    updated_task = await Database.update_task_status(task_id, status)
+    if not updated_task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    return updated_task
+
+@app.delete("/api/tasks/{task_id}")
+async def delete_task(task_id: str):
+    success = await Database.delete_task(task_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Task not found")
+    return {"message": "Task deleted successfully"}
 
 if __name__ == "__main__":
     import uvicorn
