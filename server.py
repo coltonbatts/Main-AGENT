@@ -28,8 +28,8 @@ class Task(BaseModel):
     status: str = "pending"
 
 @app.get("/", response_class=HTMLResponse)
-async def root(request: Request):
-    tasks = await Database.get_tasks()
+def root(request: Request):
+    tasks = Database.get_tasks()
     return templates.TemplateResponse(
         "index.html",
         {
@@ -42,7 +42,7 @@ async def root(request: Request):
     )
 
 @app.post("/api/tasks", response_model=Task)
-async def create_task(task: TaskCreate):
+def create_task(task: TaskCreate):
     task_data = {
         "description": task.description,
         "agent_type": task.agent_type,
@@ -50,32 +50,32 @@ async def create_task(task: TaskCreate):
         "status": "pending"
     }
     
-    created_task = await Database.create_task(task_data)
+    created_task = Database.create_task(task_data)
     if not created_task:
         raise HTTPException(status_code=500, detail="Failed to create task")
     return created_task
 
 @app.get("/api/tasks", response_model=List[Task])
-async def get_tasks():
-    return await Database.get_tasks()
+def get_tasks():
+    return Database.get_tasks()
 
 @app.get("/api/tasks/{task_id}", response_model=Task)
-async def get_task(task_id: str):
-    task = await Database.get_task(task_id)
+def get_task(task_id: str):
+    task = Database.get_task(task_id)
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
     return task
 
 @app.put("/api/tasks/{task_id}/status")
-async def update_task_status(task_id: str, status: str):
-    updated_task = await Database.update_task_status(task_id, status)
+def update_task_status(task_id: str, status: str):
+    updated_task = Database.update_task_status(task_id, status)
     if not updated_task:
         raise HTTPException(status_code=404, detail="Task not found")
     return updated_task
 
 @app.delete("/api/tasks/{task_id}")
-async def delete_task(task_id: str):
-    success = await Database.delete_task(task_id)
+def delete_task(task_id: str):
+    success = Database.delete_task(task_id)
     if not success:
         raise HTTPException(status_code=404, detail="Task not found")
     return {"message": "Task deleted successfully"}
