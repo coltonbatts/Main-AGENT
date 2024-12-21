@@ -61,23 +61,27 @@
             <div class="task-creation">
                 <h2>Create New Task</h2>
                 <form id="taskForm" class="terminal">
-                    <div class="form-group">
-                        <label for="description">Task Description:</label>
-                        <input type="text" id="description" name="description" required>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="description">Task Description:</label>
+                            <input type="text" id="description" name="description" required placeholder="Enter task description...">
+                        </div>
+                        <div class="form-group">
+                            <label for="agent_type">Assign to Agent:</label>
+                            <select id="agent_type" name="agent_type" required>
+                                <option value="">Select Agent</option>
+                                <option value="frontend">Frontend Agent</option>
+                                <option value="backend">Backend Agent</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="priority">Priority Level: <span id="priorityValue">1</span></label>
+                            <input type="range" id="priority" name="priority" min="1" max="5" value="1">
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="button">Initialize Task</button>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="agent_type">Assign to Agent:</label>
-                        <select id="agent_type" name="agent_type" required>
-                            <option value="frontend">Frontend Agent</option>
-                            <option value="backend">Backend Agent</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="priority">Priority Level:</label>
-                        <input type="range" id="priority" name="priority" min="1" max="5" value="1">
-                        <span id="priorityValue">1</span>
-                    </div>
-                    <button type="submit" class="button">Initialize Task</button>
                 </form>
             </div>
         </div>
