@@ -1,0 +1,33 @@
+project_standards:
+  coding_style: PEP 8
+  git_workflow: feature branch workflow
+  testing_requirements:
+    - unit tests
+    - integration tests
+  frontend_standards:
+    framework: React
+    style_guide: Airbnb React/JSX Style Guide
+    component_structure: Atomic Design
+  backend_standards:
+    framework: FastAPI
+    api_style: RESTful
+    documentation: OpenAPI/Swagger
+
+system_prompts:
+  general: >
+    Follow project coding standards and maintain consistent documentation.
+    All code changes must include tests.
+  frontend: >
+    Create reusable components and follow accessibility guidelines.
+    Implement responsive design patterns.
+  backend: >
+    Ensure API security, input validation, and proper error handling.
+    Document all endpoints using OpenAPI specifications.
+
+active_tasks: {}
+completed_tasks: []
+
+git_settings:
+  main_branch: main
+  feature_branch_prefix: feature/
+  release_branch_prefix: release/
